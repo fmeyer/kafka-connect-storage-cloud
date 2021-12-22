@@ -417,9 +417,10 @@ public class TopicPartitionWriter {
         currentEncodedPartition,
         periodicRotation
     );
-
-    boolean scheduledRotation = shouldApplyScheduledRotation(now);
-    return periodicRotation || scheduledRotation;
+    if (periodicRotation) {
+      return true;
+    }
+    return shouldApplyScheduledRotation(now);
   }
 
   private boolean shouldApplyScheduledRotation(long now) {
