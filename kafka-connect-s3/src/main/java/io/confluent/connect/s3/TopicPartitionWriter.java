@@ -191,6 +191,8 @@ public class TopicPartitionWriter {
       failureTime = -1;
     }
 
+    resetExpiredScheduledRotationIfNoPendingRecords(now);
+
     while (!buffer.isEmpty()) {
       try {
         executeState(now);
@@ -331,12 +333,16 @@ public class TopicPartitionWriter {
         setNextScheduledRotation();
 
         commitFiles();
-      } else if (recordCount == 0 && shouldApplyScheduledRotation(now)) {
-        setNextScheduledRotation();
       }
 
       resume();
       setState(State.WRITE_STARTED);
+    }
+  }
+
+  private void resetExpiredScheduledRotationIfNoPendingRecords(long now) {
+    if (recordCount == 0 && shouldApplyScheduledRotation(now)) {
+      setNextScheduledRotation();
     }
   }
 
